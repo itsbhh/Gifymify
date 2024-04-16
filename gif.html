@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gifymify</title>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="C:\Users\DELL\Desktop\me\gif.css">
+</head>
+<div class="container">
+    <h1 class="text-center my-4">Gifymify</h1>
+    <div class="search-container input-group mb-3">
+        <input type="text" class="form-control" id="search-box" placeholder="Search for GIFs" value="laugh">
+        <div class="input-group-append">
+            <button class="btn btn-success" id="submit-btn"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+    <div class="loader">
+        <img src="loading.gif" alt="Loading...">
+    </div>
+    <div class="wrapper">
+        <div class="container">
+            <img src="hi.gif" alt="Hi">
+            <button class="btn btn-primary btn-sm mt-2 copy-download-btn" data-url="hi.gif">Copy Link & Download</button>
+        </div>
+        <div class="container">
+            <img src="hello.gif" alt="hello">
+            <button class="btn btn-primary btn-sm mt-2 copy-download-btn" data-url="hello.gif">Copy Link & Download</button>
+        </div>
+         <div class="container">
+            <img src="howareyou.gif" alt="howareyou">
+            <button class="btn btn-primary btn-sm mt-2 copy-download-btn" data-url="howareyou.gif">Copy Link & Download</button>
+        </div> <div class="container">
+            <img src="nicetomeetyou.gif" alt="Hi">
+            <button class="btn btn-primary btn-sm mt-2 copy-download-btn" data-url="nicetomeetyou.gif">Copy Link & Download</button>
+        </div> <div class="container">
+            <img src="bye.gif" alt="bye">
+            <button class="btn btn-primary btn-sm mt-2 copy-download-btn" data-url="bye.gif">Copy Link & Download</button>
+        </div> <div class="container">
+            <img src="thankyou.gif" alt="thankyou">
+            <button class="btn btn-primary btn-sm mt-2 copy-download-btn" data-url="thankyou.gif">Copy Link & Download</button>
+        </div>
+    </div>
+    <div class="footer" id="footer" style="display: block;">
+        <p>&copy; BHH. All Rights Reserved.</p>
+    </div>
+</div>
+
+<!-- Dark Mode Toggle -->
+<div class="dark-mode-toggle">
+    <input type="checkbox" id="darkModeToggle">
+    <label for="darkModeToggle"><i class="fas fa-moon"></i></label>
+</div>
+    <!-- API Key -->
+    <script src="api-key.js"></script>
+    <!-- Script -->
+    <script src="C:\Users\DELL\Desktop\me\gif.js"></script>
+</body>
+</html>
