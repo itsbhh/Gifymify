@@ -1,3 +1,5 @@
+const apikey = "HQIA0tx0Oao3W4j0cJXowbAJiSIVSqZg"; // Your API key
+
 // Function to toggle dark mode
 const toggleDarkMode = () => {
     const darkModeToggle = document.getElementById("darkModeToggle");
@@ -11,73 +13,79 @@ const toggleDarkMode = () => {
 
 // Function to copy link and download GIF
 const copyLinkAndDownload = (url) => {
-    // Create a hidden anchor element
     const downloadAnchor = document.createElement("a");
     downloadAnchor.href = url;
     downloadAnchor.setAttribute("download", "giphy.gif");
     document.body.appendChild(downloadAnchor);
-    // Trigger click event on the anchor element
-    downloadAnchor.click();
-    // Remove the anchor element
-    document.body.removeChild(downloadAnchor);
-    // Show confirmation message
     alert("GIF link copied to clipboard and downloading started.");
+    downloadAnchor.click();
+    document.body.removeChild(downloadAnchor);
 };
+
 const showFooter = () => {
     document.getElementById("footer").style.display = "block";
 };
 
-// Function to generate GIFs
-const generateGif = () => {
-    // Display loader until GIFs load
+let submitBtn = document.getElementById("submit-btn");
+
+let generateGif = () => {
+    // Show loader while fetching data
     const loader = document.querySelector(".loader");
     loader.style.display = "block";
     document.querySelector(".wrapper").style.display = "none";
-    document.getElementById("footer").style.display = "none"; 
+    document.getElementById("footer").style.display = "none";
 
     // Get search value (default => laugh)
-    const q = document.getElementById("search-box").value;
-    // We need 15 GIFs to be displayed in result
-    const gifCount = 15;
+    let q = document.getElementById("search-box").value;
+    // We need 10 GIFs to be displayed in result
+    let gifCount = 10;
     // API URL
-    const finalURL = `http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=+q, true`;
+    let finalURL = `https://api.giphy.com/v1/gifs/search?api_key=${apikey}&q=${q}&limit=${gifCount}&offset=0&rating=g&lang=en`;
     document.querySelector(".wrapper").innerHTML = "";
 
     // Make a call to API
     fetch(finalURL)
         .then((resp) => resp.json())
         .then((info) => {
+            console.log(info.data);
             // All GIFs
-            const gifsData = info.data;
-            if (gifsData.length === 0) {
-                // If no GIFs found, display predefined GIFs
-                document.querySelector(".wrapper").style.display = "grid";
-                loader.style.display = "none";
-                showFooter();
-            } else {
-                gifsData.forEach((gif) => {
-                    // Generate cards for every GIF
-                    const container = document.createElement("div");
-                    container.classList.add("container");
-                    const img = document.createElement("img");
-                    img.src = gif.images.downsized_medium.url;
-                    container.appendChild(img);
+            let gifsData = info.data;
+            gifsData.forEach((gif) => {
+                // Generate cards for every GIF
+                let container = document.createElement("div");
+                container.classList.add("container");
+                let iframe = document.createElement("img");
+                console.log(gif);
+                iframe.setAttribute("src", gif.images.downsized_medium.url);
+                iframe.onload = () => {
+                    // If iframe has loaded correctly, reduce the count when each GIF loads
+                    gifCount--;
+                    if (gifCount == 0) {
+                        // If all GIFs have loaded, then hide loader and display GIFs UI
+                        loader.style.display = "none";
+                        document.querySelector(".wrapper").style.display = "grid";
+                        showFooter();
+                    }
+                };
+                container.append(iframe);
 
-                    // Copy link and download button
-                    const copyDownloadBtn = document.createElement("button");
-                    copyDownloadBtn.classList.add("btn", "btn-primary", "btn-sm", "mt-2", "copy-download-btn");
-                    copyDownloadBtn.innerText = "Copy Link & Download";
-                    copyDownloadBtn.dataset.url = gif.images.original.url;
-                    copyDownloadBtn.onclick = () => copyLinkAndDownload(copyDownloadBtn.dataset.url);
-                    container.appendChild(copyDownloadBtn);
+                // Copy link button
+                let copyBtn = document.createElement("button");
+                copyBtn.innerText = "Copy Link";
+                copyBtn.onclick = () => copyLinkAndDownload(gif.images.downsized_medium.url);
+                container.append(copyBtn);
 
-                    document.querySelector(".wrapper").appendChild(container);
-                });
-                loader.style.display = "none"; 
-                showFooter(); 
-            }
+                document.querySelector(".wrapper").appendChild(container);
+            });
+        })
+        .catch((error) => {
+            console.error('Error fetching data:', error);
+            // Handle error (e.g., display a message to the user)
         });
 };
 
-document.getElementById("submit-btn").addEventListener("click", generateGif);
+// Generate GIFs when user clicks on submit
+submitBtn.addEventListener("click", generateGif);
+
+// Dark mode toggle event listener
 document.getElementById("darkModeToggle").addEventListener("change", toggleDarkMode);
