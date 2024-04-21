@@ -1,4 +1,4 @@
-const apikey = "HQIA0tx0Oao3W4j0cJXowbAJiSIVSqZg"; // Your API key
+const apikey = "HQIA0tx0Oao3W4j0cJXowbAJiSIVSqZg"; //API key
 
 // Function to toggle dark mode
 const toggleDarkMode = () => {
@@ -89,3 +89,10 @@ submitBtn.addEventListener("click", generateGif);
 
 // Dark mode toggle event listener
 document.getElementById("darkModeToggle").addEventListener("change", toggleDarkMode);
+const searchInput = document.getElementById("search-box");
+
+searchInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        generateGif();
+    }
+});
