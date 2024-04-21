@@ -28,7 +28,55 @@ const showFooter = () => {
 
 let submitBtn = document.getElementById("submit-btn");
 
-let generateGif = () => {
+let loadingMore = false;
+
+// Function to load GIFs
+const loadGIFs = async (q, offset) => {
+    const gifCount = 10; // Number of GIFs to load
+    const apiUrl = `https://api.giphy.com/v1/gifs/search?api_key=${apikey}&q=${q}&limit=${gifCount}&offset=${offset}&rating=g&lang=en`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        return data.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return [];
+    }
+};
+
+// Function to load more GIFs
+const loadMoreGIFs = async () => {
+    loadingMore = true;
+    const offset = document.querySelectorAll('.container').length; // Calculate offset based on already loaded GIFs
+    const q = document.getElementById("search-box").value;
+
+    try {
+        const gifsData = await loadGIFs(q, offset);
+        gifsData.forEach((gif) => {
+            // Generate cards for every GIF
+            const container = document.createElement("div");
+            container.classList.add("container");
+            const iframe = document.createElement("img");
+            iframe.setAttribute("src", gif.images.downsized_medium.url);
+            container.appendChild(iframe);
+
+            // Copy link button
+            const copyBtn = document.createElement("button");
+            copyBtn.innerText = "Copy Link";
+            copyBtn.onclick = () => copyLinkAndDownload(gif.images.downsized_medium.url);
+            container.appendChild(copyBtn);
+
+            document.querySelector(".wrapper").appendChild(container);
+        });
+        loadingMore = false;
+    } catch (error) {
+        console.error('Error loading more GIFs:', error);
+    }
+};
+
+// Generate GIFs when user clicks on submit
+submitBtn.addEventListener("click", async () => {
     // Show loader while fetching data
     const loader = document.querySelector(".loader");
     loader.style.display = "block";
@@ -36,56 +84,46 @@ let generateGif = () => {
     document.getElementById("footer").style.display = "none";
 
     // Get search value (default => laugh)
-    let q = document.getElementById("search-box").value;
-    // We need 10 GIFs to be displayed in result
-    let gifCount = 10;
-    // API URL
-    let finalURL = `https://api.giphy.com/v1/gifs/search?api_key=${apikey}&q=${q}&limit=${gifCount}&offset=0&rating=g&lang=en`;
+    const q = document.getElementById("search-box").value;
     document.querySelector(".wrapper").innerHTML = "";
 
-    // Make a call to API
-    fetch(finalURL)
-        .then((resp) => resp.json())
-        .then((info) => {
-            console.log(info.data);
-            // All GIFs
-            let gifsData = info.data;
-            gifsData.forEach((gif) => {
-                // Generate cards for every GIF
-                let container = document.createElement("div");
-                container.classList.add("container");
-                let iframe = document.createElement("img");
-                console.log(gif);
-                iframe.setAttribute("src", gif.images.downsized_medium.url);
-                iframe.onload = () => {
-                    // If iframe has loaded correctly, reduce the count when each GIF loads
-                    gifCount--;
-                    if (gifCount == 0) {
-                        // If all GIFs have loaded, then hide loader and display GIFs UI
-                        loader.style.display = "none";
-                        document.querySelector(".wrapper").style.display = "grid";
-                        showFooter();
-                    }
-                };
-                container.append(iframe);
+    try {
+        const gifsData = await loadGIFs(q, 0);
+        gifsData.forEach((gif) => {
+            // Generate cards for every GIF
+            const container = document.createElement("div");
+            container.classList.add("container");
+            const iframe = document.createElement("img");
+            iframe.setAttribute("src", gif.images.downsized_medium.url);
+            container.appendChild(iframe);
 
-                // Copy link button
-                let copyBtn = document.createElement("button");
-                copyBtn.innerText = "Copy Link";
-                copyBtn.onclick = () => copyLinkAndDownload(gif.images.downsized_medium.url);
-                container.append(copyBtn);
+            // Copy link button
+            const copyBtn = document.createElement("button");
+            copyBtn.innerText = "Copy Link";
+            copyBtn.onclick = () => copyLinkAndDownload(gif.images.downsized_medium.url);
+            container.appendChild(copyBtn);
 
-                document.querySelector(".wrapper").appendChild(container);
-            });
-        })
-        .catch((error) => {
-            console.error('Error fetching data:', error);
-            // Handle error (e.g., display a message to the user)
+            document.querySelector(".wrapper").appendChild(container);
         });
-};
-
-// Generate GIFs when user clicks on submit
-submitBtn.addEventListener("click", generateGif);
+        // If all GIFs have loaded, then hide loader and display GIFs UI
+        loader.style.display = "none";
+        document.querySelector(".wrapper").style.display = "grid";
+        showFooter();
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        // Handle error (e.g., display a message to the user)
+    }
+});
 
 // Dark mode toggle event listener
 document.getElementById("darkModeToggle").addEventListener("change", toggleDarkMode);
+
+// Track scroll position to trigger lazy loading
+window.addEventListener('scroll', () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        // When user reaches the bottom of the page, load more GIFs
+        if (!loadingMore) { // Ensure not loading more already
+            loadMoreGIFs();
+        }
+    }
+});
